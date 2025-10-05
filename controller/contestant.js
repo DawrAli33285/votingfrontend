@@ -3,7 +3,19 @@ const fs=require('fs')
 const jwt=require('jsonwebtoken');
 const contenstantModel = require('../models/contenstant');
 
-const { v4}=require('uuid')
+
+function generatePassword(length = 12) {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+";
+    let password = "";
+  
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * chars.length);
+      password += chars[randomIndex];
+    }
+  
+    return password;
+  }
 module.exports.registerContestant = async (req, res) => {
     const stripe = require('stripe')("sk_test_51OwuO4LcfLzcwwOYsXYljgE1gUyGnLFvjewSf1NG9CsrSqTsxm7n7ppmZ2ZIFL01ptVDhuW7LixPggik41wWmOyE00RjWnYxUA"); 
     const { paymentMethod, ...data } = req.body; 
@@ -81,7 +93,7 @@ module.exports.registerContestant = async (req, res) => {
         if (paymentIntent.status === 'succeeded') {
           
           
-            data.code=v4();
+            data.code=generatePassword(12);
          let contenstant=await contenstantModel.create(data);
             
             return res.status(200).json({
@@ -154,7 +166,7 @@ module.exports.resetCode = async (req, res) => {
   
       console.log('Found contestant:', contestant);
       
-     let code=v4();
+     let code=generatePassword(12);
 
      await contenstantModel.updateOne({email},{
         $set:{
